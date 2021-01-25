@@ -1,0 +1,1 @@
+In this path, the files of duplicate elements will be stored
