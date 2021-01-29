@@ -30,15 +30,24 @@ from PyPDF2 import PdfFileMerger
 
 # Definicion ruta y ficheros de trabajo:
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))
-CONFIG_DIR = 'config\\'
-INPUT_DIR = 'input\\'
-OUTPUT_DIR = 'output\\'
-DUPLICATE_DIR = 'duplicate\\'
-TEMP_DIR = os.path.join(BASE_PATH, 'temp')
-TEMPORAL_PATH = os.path.join(BASE_PATH, 'temp\\')
 DATA_SOURCE_CONFIG_FILE = 'data_source.ini'
 EVENT_TYPOLOGY_CONFIG_FILE = 'event_typology.ini'
 ENCODING = 'utf-8'
+
+if os.name == 'nt':
+    CONFIG_DIR = 'config\\'
+    INPUT_DIR = 'input\\'
+    OUTPUT_DIR = 'output\\'
+    DUPLICATE_DIR = 'duplicate\\'
+    TEMP_DIR = os.path.join(BASE_PATH, 'temp')
+    TEMPORAL_PATH = os.path.join(BASE_PATH, 'temp\\')
+else:
+    CONFIG_DIR = 'config/'
+    INPUT_DIR = 'input/'
+    OUTPUT_DIR = 'output/'
+    DUPLICATE_DIR = 'duplicate/'
+    TEMP_DIR = os.path.join(BASE_PATH, 'temp')
+    TEMPORAL_PATH = os.path.join(BASE_PATH, 'temp/')
 
 
 # Numero maximo de lineas a tratar en cada iteracion:
@@ -723,7 +732,7 @@ def inicializar_estructura_valoracion(t_f, d_s_p, e_t_p, no_parametrizadas):
                               'Clase tipologia': e_t_p.get(tipologia, 'class'),
                               'Data source': fuente,
                               'Data source type': tipo_fuente,
-                              'Valoracion datos obsoletos': d_s_p.get(fuente, 'obsolete_ data_ evaluation',),
+                              'Valoracion datos obsoletos': d_s_p.get(fuente, 'obsolete_ data_evaluation',),
                               'Tasa falsos positivos': d_s_p.get(fuente, 'false_positive_rate',),
                               'Cantidad': 0,
                               'Completitud': 0,
@@ -1333,7 +1342,7 @@ def valorar_nivel_informacion(val):
     """
 
     val['Nivel de informacion'] = round((val['Nivel de informacion'] / val['Cantidad']), 3)
- 
+
 
     return val
 
@@ -2016,7 +2025,7 @@ def valorar_calidad_global(val):
     return val_fuentes
 
 
-#################################################################################################### 
+####################################################################################################
 def valorar_porcentaje_por_evento(val):
     """
     Gets data for the "event percentage in each event class" report.
@@ -2505,6 +2514,7 @@ def valorar_datos_por_fuente(val):
 def norm(x):
     """
     Normalized column sum method.
+    Source code adapted from J. Papathanasiou 2018.
 
     Parameters
     ----------
@@ -2530,7 +2540,8 @@ def norm(x):
 ####################################################################################################
 def geomean(x):
     """
-    Geometric mean method
+    Geometric mean method.
+    Source code adapted from J. Papathanasiou 2018.
 
     Paramenters
     -----------
@@ -2557,7 +2568,8 @@ def geomean(x):
 ####################################################################################################
 def ahp(PCM, PCcriteria, m, n, c):
     """
-    AHP method: it calls the other functions
+    AHP method: it calls the other functions.
+    Source code adapted from J. Papathanasiou 2018.
 
     Parameters
     ----------
@@ -3389,7 +3401,7 @@ def generar_informe_tipologias(val):
 
 
 ####################################################################################################
-def crear_report_ranking(path, titulo, df_val_fuentes, df_pesos, df_clasificacion, df_pccriteria):
+def crear_report_ranking(path, titulo, df_val_fuentes, df_pesos, df_clasificacion, dict_gamm, df_pccriteria):
     """
     Generates datasource ranking report in pdf format.
 
@@ -3486,6 +3498,10 @@ def crear_report_ranking(path, titulo, df_val_fuentes, df_pesos, df_clasificacio
             tabla_formateada += "</tr>"
         tabla_formateada += "</table>"
 
+        gamma = dict_gamm[tipologia]
+        gamma = str(gamma)
+        tabla_formateada += "<br/><h3>Goodman-Kruskal gamma for event typology " + tipologia + ": " + gamma + "</h3>"
+
     # Indicacion de pesos utilizados en la valoracion de dimensiones de calidad
     tabla_formateada += "<br/><h4><i>Weights of score levels used to compile the ranking:</i></h4>"
     tabla_formateada += "<table align='left' width='40%' border='1' cellspacing='0' cellpadding='2'><tr>"
@@ -3533,6 +3549,150 @@ def crear_report_ranking(path, titulo, df_val_fuentes, df_pesos, df_clasificacio
             pisa.CreatePDF(html_leido.read(), fichero_intermedio)  # ,encoding='cp1252')
     if os.path.exists(ruta_plantilla_temporal):
         os.remove(ruta_plantilla_temporal)
+
+
+
+####################################################################################################
+def goodman_kruskal_gamma(df_ranking_tip):
+    """
+    Calculates Goodman-Kruskal gammma.
+    Source code adapted from https://bit.ly/3fZQ04L (https://PeterStatistics.com).
+
+    Parameters
+    ----------
+    df_ranking_tip: pandas dataframe
+                    Scores for one data source classification
+
+    Returns
+    -------
+    gk_gamma: float
+              Goodman-Kruskal gamma
+    """
+
+    ord_wsm = df_ranking_tip['wsm']
+    ord_ahp = df_ranking_tip['ahp']
+
+    crosstable = pd.crosstab(ord_wsm, ord_ahp)
+
+    n_rows = crosstable.shape[0]
+    n_cols = crosstable.shape[1]
+
+    C = [[0 for x in range(n_cols)] for y in range(n_rows)]
+
+    # top left part
+    for i in range(n_rows):
+        for j in range(n_cols):
+            h = i-1
+            k = j-1
+            if h >= 0 and k >= 0:
+                for p in range(h+1):
+                    for q in range(k+1):
+                        C[i][j] = C[i][j] + list(crosstable.iloc[p])[q]
+    
+    # bottom right part                    
+    for i in range(n_rows):
+        for j in range(n_cols):
+            h = i+1
+            k = j+1
+            if h < n_rows and k < n_cols:
+                for p in range(h, n_rows):
+                    for q in range(k, n_cols):
+                        C[i][j] = C[i][j] + list(crosstable.iloc[p])[q]
+
+    D = [[0 for x in range(n_cols)] for y in range(n_rows)]
+
+    # bottom left part
+    for i in range(n_rows):
+        for j in range(n_cols):
+            h = i+1
+            k = j-1
+            if h < n_rows and k >= 0:
+                for p in range(h, n_rows):
+                    for q in range(k+1):
+                        D[i][j] = D[i][j] + list(crosstable.iloc[p])[q]
+
+    # top right part
+    for i in range(n_rows):
+        for j in range(n_cols):
+            h = i-1
+            k = j+1
+            if h >= 0 and k < n_cols:
+                for p in range(h+1):
+                    for q in range(k, n_cols):
+                        D[i][j] = D[i][j] + list(crosstable.iloc[p])[q]
+
+    P = 0
+    Q = 0
+    for i in range(n_rows):
+        for j in range(n_cols):
+            P = P + C[i][j] * crosstable.iloc[i][j+1]
+            Q = Q + D[i][j] * crosstable.iloc[i][j+1]
+
+    gk_gamma = (P - Q) / (P + Q)
+
+    if np.isnan(gk_gamma):
+        gk_gamma = 1.0
+
+    gk_gamma = round(gk_gamma, 3)
+
+
+    return gk_gamma
+
+
+
+####################################################################################################
+def calcular_gammas(df_clasif):
+    """
+    Sets the wsm and ahp rankings, and call the Goodman-Kruskal gamma calculation function, for each
+    event typology.
+
+    Parameters
+    ----------
+    df_clasif: pandas_dataframe
+               Scores for data source classification
+
+    Returns
+    -------
+    dict_gamm: dictionary
+               Goodman-Kruskal gamma for each event typology
+    """
+
+
+    dict_gamm = {}
+    for tipologia in sorted(set(df_clasif['Event typology'])):
+        df_ranking_tip = df_clasif[df_clasif['Event typology'] == tipologia]
+        df_ranking_tip['wsm'] = 0
+        df_ranking_tip['ahp'] = 0
+
+        df_ranking_tip.sort_values(['Quality'], ascending=[False], inplace=True)
+        df_ranking_tip.reset_index(drop=True, inplace=True)
+        for i in range(len(df_ranking_tip)):
+            if i == 0:
+                df_ranking_tip.loc[i, 'wsm'] = 1
+            elif df_ranking_tip.loc[i, 'Quality'] == df_ranking_tip.loc[i-1, 'Quality']:
+                df_ranking_tip.loc[i, 'wsm'] = df_ranking_tip.loc[i-1, 'wsm']
+            else:
+                df_ranking_tip.loc[i, 'wsm'] = df_ranking_tip.loc[i-1, 'wsm'] + 1
+
+        df_ranking_tip.sort_values(['AHP score'], ascending=[False], inplace=True)
+        df_ranking_tip.reset_index(drop=True, inplace=True)
+        for i in range(len(df_ranking_tip)):
+            if i == 0:
+                df_ranking_tip.loc[i, 'ahp'] = 1
+            elif df_ranking_tip.loc[i, 'AHP score'] == df_ranking_tip.loc[i-1, 'AHP score']:
+                df_ranking_tip.loc[i, 'ahp'] = df_ranking_tip.loc[i-1, 'ahp']
+            else:
+                df_ranking_tip.loc[i, 'ahp'] = df_ranking_tip.loc[i-1, 'ahp'] + 1
+
+        df_ranking_tip.drop(['Event typology', 'Quality', 'AHP score'],
+                            axis='columns',
+                            inplace=True)
+
+        gamma = goodman_kruskal_gamma(df_ranking_tip)
+        dict_gamm[tipologia] = gamma
+
+
+    return dict_gamm
 
 
 
@@ -3587,6 +3747,9 @@ def generar_informe_ranking(val_fuentes, val, PCcriteria):
                                      'Calidad': 'Quality'
                                      }, inplace=True)
 
+
+    dict_gammmas = calcular_gammas(df_clasificacion)
+
     columnas = ['CRITERIA']
     columnas += CRITERIOS_AHP
     df_pccriteria = pd.DataFrame(columns=columnas)
@@ -3605,6 +3768,7 @@ def generar_informe_ranking(val_fuentes, val, PCcriteria):
                          df_valoracion_fuentes,
                          df_pesos,
                          df_clasificacion,
+                         dict_gammmas,
                          df_pccriteria)
 
 

@@ -27,7 +27,7 @@ def main():
 
     # Lectura del separador de datos y periodo de la muestra de datos
     separador, data_period, pc_criteria = cd.leer_caracteristicas_muestra()
-    
+
     inicio = time()
     print('Work in progress...')
 
