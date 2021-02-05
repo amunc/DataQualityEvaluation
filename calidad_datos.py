@@ -10,6 +10,14 @@ import warnings
 import lib_calidad_datos as cd
 
 
+# Mensajes de salida
+OUTPUT_MSG_01 = 'Work in progress...'
+OUTPUT_MSG_02 = 'Looking for duplicate data...'
+OUTPUT_MSG_03 = 'Evalualting data sources and event typologies...'
+OUTPUT_MSG_04 = 'Generating reports...'
+OUTPUT_MSG_05 = 'Evaluating process completed'
+
+
 
 def main():
     """
@@ -29,7 +37,7 @@ def main():
     separador, data_period, pc_criteria = cd.leer_caracteristicas_muestra()
 
     inicio = time()
-    print('Work in progress...')
+    print(OUTPUT_MSG_01)
 
     # Carga de los ficheros de parametrizacion de tipologias de eventos y de
     #   fuentes de datos (data_source.ini y event_typology.ini)
@@ -68,6 +76,7 @@ def main():
     valoracion = cd.valorar_precio_por_dato(valoracion, data_period)
 
     # Cálculo de duplicados
+    print(OUTPUT_MSG_02)
     valoracion = cd.encontrar_duplicados(valoracion, event_typology_parser)
 
 
@@ -77,6 +86,8 @@ def main():
 # Calculo de las dimensiones de calidad normalizadas.                                              #
 #                                                                                                  #
 ####################################################################################################
+
+    print(OUTPUT_MSG_03)
 
     # Cáclulo de cantidad normalizada
     valoracion = cd.calcular_cantidad_normalizada(valoracion)
@@ -154,6 +165,8 @@ def main():
 #                                                                                                  #
 ####################################################################################################
 
+    print(OUTPUT_MSG_04)
+
     cd.generar_plots(valoracion, 'Data source')
     cd.generar_informe_fuentes(valoracion, valoracion_fuentes)
 
@@ -189,9 +202,11 @@ def main():
 
     cd.concatenar_pdfs()
 
+    print(OUTPUT_MSG_05)
+
     fin = time()
     tiempo = fin - inicio
-    print('Total time: ', round(tiempo, 0), 'secs')
+    print('Total time:', round(tiempo, 0), 'secs')
 
 
 

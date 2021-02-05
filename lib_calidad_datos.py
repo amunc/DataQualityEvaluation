@@ -163,11 +163,24 @@ DICT_CLASES_EVENTOS = {'C01': 'Abusive content',
 
 
 # Mensajes de pantalla:
-INPUT_MSG_001 = 'Indicate the value separator character, in csv file: '
-INPUT_MSG_002 = 'Indicate the period (in days) to which the sample refers: '
-
-INPUT_MSG_003 = 'If you want to weight the APH criteria, enter Y, otherwise, enter N: '
-
+INPUT_MSG_001 = 'Indicate the importance of Quantity over Duplicity: '
+INPUT_MSG_002 = 'Indicate the importance of Quantity over Completeness: '
+INPUT_MSG_003 = 'Indicate the importance of Quantity over Information level: '
+INPUT_MSG_004 = 'Indicate the importance of Quantity over Veracity: '
+INPUT_MSG_005 = 'Indicate the importance of Quantity over Unknown veracity: '
+INPUT_MSG_006 = 'Indicate the importance of Duplicity over Completeness: '
+INPUT_MSG_007 = 'Indicate the importance of Duplicity over Information level: '
+INPUT_MSG_008 = 'Indicate the importance of Duplicity over Veracity: '
+INPUT_MSG_009 = 'Indicate the importance of Duplicity over Unknown veracity: '
+INPUT_MSG_010 = 'Indicate the importance of Completeness over Information level: '
+INPUT_MSG_011 = 'Indicate the importance of Completeness over Veracity: '
+INPUT_MSG_012 = 'Indicate the importance of Completeness over Unknown veracity: '
+INPUT_MSG_013 = 'Indicate the importance of Information level over Veracity: '
+INPUT_MSG_014 = 'Indicate the importance of Information level over Unknown veracity: '
+INPUT_MSG_015 = 'Indicate the importance of Veracity over Unknown veracity: '
+INPUT_MSG_016 = 'Indicate the value separator character, in csv file: '
+INPUT_MSG_017 = 'Indicate the period (in days) to which the sample refers: '
+INPUT_MSG_018 = 'If you want to weight the APH criteria, enter Y, otherwise, enter N: '
 
 OUTPUT_MSG_001 = "Next, you have to assess the importance of the different evaluation criteria comparing them in pairs."
 OUTPUT_MSG_002 = "Select the appropriate option for each pair of criteria:"
@@ -180,39 +193,29 @@ OUTPUT_MSG_008 = "1/3: Moderately less important"
 OUTPUT_MSG_009 = "1/5: Strongly less important"
 OUTPUT_MSG_010 = "1/7: Very strongly less important"
 OUTPUT_MSG_011 = "1/9: Extremely less important"
-
-
-INPUT_MSG_004 = 'Indicate the importance of Quantity over Duplicity: '
-INPUT_MSG_005 = 'Indicate the importance of Quantity over Completeness: '
-INPUT_MSG_006 = 'Indicate the importance of Quantity over Information level: '
-INPUT_MSG_007 = 'Indicate the importance of Quantity over Veracity: '
-INPUT_MSG_008 = 'Indicate the importance of Quantity over Unknown veracity: '
-INPUT_MSG_009 = 'Indicate the importance of Duplicity over Completeness: '
-INPUT_MSG_010 = 'Indicate the importance of Duplicity over Information level: '
-INPUT_MSG_011 = 'Indicate the importance of Duplicity over Veracity: '
-INPUT_MSG_012 = 'Indicate the importance of Duplicity over Unknown veracity: '
-INPUT_MSG_013 = 'Indicate the importance of Completeness over Information level: '
-INPUT_MSG_014 = 'Indicate the importance of Completeness over Veracity: '
-INPUT_MSG_015 = 'Indicate the importance of Completeness over Unknown veracity: '
-INPUT_MSG_016 = 'Indicate the importance of Information level over Veracity: '
-INPUT_MSG_017 = 'Indicate the importance of Information level over Unknown veracity: '
-INPUT_MSG_018 = 'Indicate the importance of Veracity over Unknown veracity: '
+OUTPUT_MSG_012 = "Inconsistency index of the criteria: "
+OUTPUT_MSG_013 = "Processing file"
+OUTPUT_MSG_014 = "Inconsistency indexes for typology "
+OUTPUT_MSG_015 = "Inconsistency index of the alternatives for criterion "
 
 
 # Mensajes de aviso:
-WARNING_MSG_101A = 'WARNING: Data source \"'
-WARNING_MSG_101B = '\" configuration could not be loaded. Please, check file '
+WARNING_MSG_101 = 'WARNING: The pairwise comparison matrix of the criteria is inconsistent. Please, select values again'
+WARNING_MSG_102A = 'WARNING: Data source \"'
+WARNING_MSG_102B = '\" configuration could not be loaded. Please, check file '
+WARNING_MSG_103A = 'The pairwise comparison matrix of the alternatives for criterion '
+WARNING_MSG_103B = ' is inconsistent'
 
 
 # Mensajes de error:
 ERROR_MSG_201 = 'ERROR: Data source configuration file can not be opened'
 ERROR_MSG_202 = 'ERROR: Event typology configuration file can not be opened'
-ERROR_MSG_203 = 'ERROR: No se han encotrado ficheros de entrada'
+ERROR_MSG_203 = 'ERROR: No input files found'
 ERROR_MSG_204 = 'ERROR: Data sample file can not be opened'
 ERROR_MSG_205 = 'ERROR: Configuration file error: settings are not valid for data sample'
-ERROR_MSG_206 = 'ERROR: Data sample file can not be opened'
-ERROR_MSG_207 = 'ERROR: Configuration file error: attribute campos_obligatorios does not exist'
-ERROR_MSG_208 = 'ERROR: Configuration file error: atribute %s does not exist'
+ERROR_MSG_206 = 'ERROR: Configuration file error: attribute campos_obligatorios does not exist'
+ERROR_MSG_207 = 'ERROR: Configuration file error: atribute %s does not exist'
+ERROR_MSG_208 = 'ERROR: There was a problem grouping data by typology and data source'
 ERROR_MSG_209 = 'ERROR: Merging pdfs failed. File: '
 ERROR_MSG_210 = 'ERROR: Merging pdfs failed. Unable to create global report'
 
@@ -262,7 +265,7 @@ def leer_criterios_ahp():
 
         importancia = 0
         while importancia == 0:
-            lectura = input(INPUT_MSG_004)
+            lectura = input(INPUT_MSG_001)
             if lectura in VALORES_AHP:
                 importancia = float(Fraction(lectura))
                 PCcriteria[0, 1] = importancia
@@ -272,7 +275,7 @@ def leer_criterios_ahp():
 
         importancia = 0
         while importancia == 0:
-            lectura = input(INPUT_MSG_005)
+            lectura = input(INPUT_MSG_002)
             if lectura in VALORES_AHP:
                 importancia = float(Fraction(lectura))
                 PCcriteria[0, 2] = importancia
@@ -282,7 +285,7 @@ def leer_criterios_ahp():
 
         importancia = 0
         while importancia == 0:
-            lectura = input(INPUT_MSG_006)
+            lectura = input(INPUT_MSG_003)
             if lectura in VALORES_AHP:
                 importancia = float(Fraction(lectura))
                 PCcriteria[0, 3] = importancia
@@ -292,7 +295,7 @@ def leer_criterios_ahp():
 
         importancia = 0
         while importancia == 0:
-            lectura = input(INPUT_MSG_007)
+            lectura = input(INPUT_MSG_004)
             if lectura in VALORES_AHP:
                 importancia = float(Fraction(lectura))
                 PCcriteria[0, 4] = importancia
@@ -302,7 +305,7 @@ def leer_criterios_ahp():
 
         importancia = 0
         while importancia == 0:
-            lectura = input(INPUT_MSG_008)
+            lectura = input(INPUT_MSG_005)
             if lectura in VALORES_AHP:
                 importancia = float(Fraction(lectura))
                 PCcriteria[0, 5] = importancia
@@ -312,7 +315,7 @@ def leer_criterios_ahp():
 
         importancia = 0
         while importancia == 0:
-            lectura = input(INPUT_MSG_009)
+            lectura = input(INPUT_MSG_006)
             if lectura in VALORES_AHP:
                 importancia = float(Fraction(lectura))
                 PCcriteria[1, 2] = importancia
@@ -322,7 +325,7 @@ def leer_criterios_ahp():
 
         importancia = 0
         while importancia == 0:
-            lectura = input(INPUT_MSG_010)
+            lectura = input(INPUT_MSG_007)
             if lectura in VALORES_AHP:
                 importancia = float(Fraction(lectura))
                 PCcriteria[1, 3] = importancia
@@ -332,7 +335,7 @@ def leer_criterios_ahp():
 
         importancia = 0
         while importancia == 0:
-            lectura = input(INPUT_MSG_011)
+            lectura = input(INPUT_MSG_008)
             if lectura in VALORES_AHP:
                 importancia = float(Fraction(lectura))
                 PCcriteria[1, 4] = importancia
@@ -342,7 +345,7 @@ def leer_criterios_ahp():
 
         importancia = 0
         while importancia == 0:
-            lectura = input(INPUT_MSG_012)
+            lectura = input(INPUT_MSG_009)
             if lectura in VALORES_AHP:
                 importancia = float(Fraction(lectura))
                 PCcriteria[1, 5] = importancia
@@ -352,7 +355,7 @@ def leer_criterios_ahp():
 
         importancia = 0
         while importancia == 0:
-            lectura = input(INPUT_MSG_013)
+            lectura = input(INPUT_MSG_010)
             if lectura in VALORES_AHP:
                 importancia = float(Fraction(lectura))
                 PCcriteria[2, 3] = importancia
@@ -362,7 +365,7 @@ def leer_criterios_ahp():
 
         importancia = 0
         while importancia == 0:
-            lectura = input(INPUT_MSG_014)
+            lectura = input(INPUT_MSG_011)
             if lectura in VALORES_AHP:
                 importancia = float(Fraction(lectura))
                 PCcriteria[2, 4] = importancia
@@ -372,7 +375,7 @@ def leer_criterios_ahp():
 
         importancia = 0
         while importancia == 0:
-            lectura = input(INPUT_MSG_015)
+            lectura = input(INPUT_MSG_012)
             if lectura in VALORES_AHP:
                 importancia = float(Fraction(lectura))
                 PCcriteria[2, 5] = importancia
@@ -382,7 +385,7 @@ def leer_criterios_ahp():
 
         importancia = 0
         while importancia == 0:
-            lectura = input(INPUT_MSG_016)
+            lectura = input(INPUT_MSG_013)
             if lectura in VALORES_AHP:
                 importancia = float(Fraction(lectura))
                 PCcriteria[3, 4] = importancia
@@ -392,7 +395,7 @@ def leer_criterios_ahp():
 
         importancia = 0
         while importancia == 0:
-            lectura = input(INPUT_MSG_017)
+            lectura = input(INPUT_MSG_014)
             if lectura in VALORES_AHP:
                 importancia = float(Fraction(lectura))
                 PCcriteria[3, 5] = importancia
@@ -402,7 +405,7 @@ def leer_criterios_ahp():
 
         importancia = 0
         while importancia == 0:
-            lectura = input(INPUT_MSG_018)
+            lectura = input(INPUT_MSG_015)
             if lectura in VALORES_AHP:
                 importancia = float(Fraction(lectura))
                 PCcriteria[4, 5] = importancia
@@ -420,10 +423,10 @@ def leer_criterios_ahp():
         lambdamax = np.amax(np.linalg.eigvals(PCcriteria).real)
         CI = (lambdamax - n) / (n - 1)
         CR = CI / RI[n - 1]
-        print("Inconsistency index of the criteria: ", CR)
+        print(OUTPUT_MSG_012, CR)
         if CR > 0.1:
             print(PCcriteria)
-            print("The pairwise comparison matrix of the criteria is inconsistent")
+            print(WARNING_MSG_101)
         else:
             consistente = True
 
@@ -461,16 +464,16 @@ def leer_caracteristicas_muestra():
                 Pairwise comparison matrix of the criteria
     """
 
-    sep = input(INPUT_MSG_001)
-    per = float(input(INPUT_MSG_002))
+    sep = input(INPUT_MSG_016)
+    per = float(input(INPUT_MSG_017))
 
     ponderar = "X"
     while ponderar not in ('Y', 'y', 'N', 'n'):
-        ponderar = input(INPUT_MSG_003)
+        ponderar = input(INPUT_MSG_018)
 
     if ponderar in ('N', 'n'):
         PCcriteria = np.array([[1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-                               [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                                [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                                [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                                [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                                [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
@@ -601,9 +604,6 @@ def borrar_salida():
         os.remove(f)
 
 
-    return
-
-
 
 ####################################################################################################
 def cargar_fichero_muestra_by_chunks(fic, separ):
@@ -628,7 +628,7 @@ def cargar_fichero_muestra_by_chunks(fic, separ):
     try:
         dat = pd.read_csv(path_to_sample_file, sep=separ, chunksize=CHUNKSIZE)
     except Exception:
-        print(ERROR_MSG_206)
+        print(ERROR_MSG_204)
         sys.exit()
 
 
@@ -920,7 +920,7 @@ def obtener_campos_obligatorios(tip, e_t_p):
             tmp = tmp.replace('\n', '')
             cam_obl = tmp.split(",")
         except Exception:
-            print(ERROR_MSG_207)
+            print(ERROR_MSG_206)
             sys.exit()
 
 
@@ -1002,7 +1002,7 @@ def obtener_parametro(parametro, tip, c_p):
         try:
             valor_parametro = c_p.get('Default Section', parametro)
         except Exception:
-            print(ERROR_MSG_208, parametro)
+            print(ERROR_MSG_207, parametro)
             sys.exit()
 
 
@@ -1254,7 +1254,7 @@ def valorar_dimensiones(lis_fic, separ, d_s_p, e_t_p):
     i = 0
     no_parametrizadas = []
     for path in lis_fic:
-        print("Processing file ", path)
+        print(OUTPUT_MSG_013, path)
         reader = cargar_fichero_muestra_by_chunks(path, separ)
         for chunk in reader:
             val_aux = pd.DataFrame()
@@ -1270,7 +1270,7 @@ def valorar_dimensiones(lis_fic, separ, d_s_p, e_t_p):
     no_parametrizadas = list(set(no_parametrizadas))
     no_parametrizadas.sort()
     for fuente in no_parametrizadas:
-        print(WARNING_MSG_101A, fuente, WARNING_MSG_101B, DATA_SOURCE_CONFIG_FILE, sep='')
+        print(WARNING_MSG_102A, fuente, WARNING_MSG_102B, DATA_SOURCE_CONFIG_FILE, sep='')
 
 
     return val
@@ -1468,7 +1468,8 @@ def encontrar_duplicados(val, e_t_p):
             if len(indice) == 1:
                 indice = indice[0]
             elif len(indice) > 1:
-                print('ERROR')
+                print('ERROR_MSG_208')
+                sys.exit()
 
             valoracion.loc[indice, 'Duplicados'] = total_duplicados
 
@@ -2716,21 +2717,14 @@ def ejecutar_ahp(val, PCcriteria, s_m, c, tip):
         allPCM = np.vstack((allPCM, PCM))
 
     # consistency check for pairwise comparison matrix of the alternatives
-    print("Inconsistency indexes for typology ", tip, ":", sep="")
+    # XXX print(OUTPUT_MSG_014, tip, ":", sep="")
     for i in range(n):
         lambdamax = np.amax(np.linalg.eigvals(allPCM[i * m:i * m + m, 0:m]).real)
         CI = (lambdamax - m) / (m - 1)
         CR = CI / RI[m - 1]
-        print("Inconsistency index of the alternatives for criterion ",
-              CRITERIOS_AHP[i],
-              ": ",
-              CR,
-              sep="")
+        # XXX print(OUTPUT_MSG_015, CRITERIOS_AHP[i], ": ", CR, sep="")
         if CR > 0.1:
-            print("The pairwise comparison matrix of the alternatives for criterion ",
-                  CRITERIOS_AHP[i],
-                  " is inconsistent",
-                  sep="")
+            print(WARNING_MSG_103A, CRITERIOS_AHP[i], WARNING_MSG_103B, sep="")
 
     # call ahp method
     scores = ahp(allPCM, PCcriteria, m, n, c)
@@ -3588,8 +3582,8 @@ def goodman_kruskal_gamma(df_ranking_tip):
                 for p in range(h+1):
                     for q in range(k+1):
                         C[i][j] = C[i][j] + list(crosstable.iloc[p])[q]
-    
-    # bottom right part                    
+
+    # bottom right part
     for i in range(n_rows):
         for j in range(n_cols):
             h = i+1
@@ -3656,7 +3650,6 @@ def calcular_gammas(df_clasif):
     dict_gamm: dictionary
                Goodman-Kruskal gamma for each event typology
     """
-
 
     dict_gamm = {}
     for tipologia in sorted(set(df_clasif['Event typology'])):
