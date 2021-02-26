@@ -676,6 +676,7 @@ def inicializar_estructura_valoracion(t_f, d_s_p, e_t_p, no_parametrizadas):
                                 'Cantidad nivel',
                                 'Cantidad AHP',
                                 'Duplicados',
+                                'Duplicados otras fuentes',
                                 'Duplicados normalizada',
                                 'Duplicados nivel',
                                 'Duplicados AHP',
@@ -735,6 +736,7 @@ def inicializar_estructura_valoracion(t_f, d_s_p, e_t_p, no_parametrizadas):
                               'Valoracion datos obsoletos': d_s_p.get(fuente, 'obsolete_ data_evaluation',),
                               'Tasa falsos positivos': d_s_p.get(fuente, 'false_positive_rate',),
                               'Cantidad': 0,
+                              'Duplicados otras fuentes': 0,
                               'Completitud': 0,
                               'Nivel de informacion': 0,
                               'Veracidad': 0,
@@ -1189,7 +1191,7 @@ def process_chunk(data, d_s_p, e_t_p, no_parametrizadas):
         valoracion = valorar_relevancia(valoracion, data_aux, i)
 
 
-    # Genracion de csv para la busqueda de duplicados
+    # Generacion de csv para la busqueda de duplicados
     for tipologia in set(valoracion['Tipologia']):
         campos_clave = [FIELD_DATA_SOURCE, FIELD_ID]
         try:
@@ -1464,6 +1466,14 @@ def encontrar_duplicados(val, e_t_p):
             data_tmp = df_duplicados[(df_duplicados[FIELD_DATA_SOURCE] == fuente)]
             total_duplicados = data_tmp.shape[0]
 
+            # duplicados con otras fuentes
+            df_fuente_aux = df_duplicados[(df_duplicados[FIELD_DATA_SOURCE] == fuente)]
+            df_otras_aux = df_duplicados[(df_duplicados[FIELD_DATA_SOURCE] != fuente)]
+            df_fuente_aux = df_fuente_aux.drop([FIELD_DATA_SOURCE, FIELD_ID], axis=1)
+            df_otras_aux = df_otras_aux.drop([FIELD_DATA_SOURCE, FIELD_ID], axis=1)
+            df_aux = df_fuente_aux.merge(df_otras_aux.drop_duplicates(), how='inner')
+            duplicados_otras_fuentes = df_aux.shape[0]
+
             indice = valoracion[(valoracion['Data source'] == fuente) & (valoracion['Tipologia'] == tipologia)].index.tolist()
             if len(indice) == 1:
                 indice = indice[0]
@@ -1472,6 +1482,7 @@ def encontrar_duplicados(val, e_t_p):
                 sys.exit()
 
             valoracion.loc[indice, 'Duplicados'] = total_duplicados
+            valoracion.loc[indice, 'Duplicados otras fuentes'] = valoracion.loc[indice, 'Duplicados otras fuentes'] + duplicados_otras_fuentes
 
 
     return valoracion
@@ -1984,6 +1995,7 @@ def valorar_calidad_global(val):
                                         'Tipologias',
                                         'Valoracion datos obsoletos',
                                         'Tasa falsos positivos',
+                                        'Tasa duplicados otras fuentes',
                                         'Precio',
                                         'Valoracion manual',
                                         'Calidad',
@@ -1998,6 +2010,10 @@ def valorar_calidad_global(val):
         tip = len(df_aux)
         vdo = df_aux.loc[df_aux.index[0], 'Valoracion datos obsoletos']
         tfp = df_aux.loc[df_aux.index[0], 'Tasa falsos positivos']
+        dof = df_aux['Duplicados otras fuentes'].sum()
+        can = df_aux['Cantidad'].sum()
+        tdof = dof/can
+        tdof = round(tdof, 3)
         pre = df_aux.loc[df_aux.index[0], 'Precio']
         pre = round(pre, 2)
         v_m = df_aux.loc[df_aux.index[0], 'Valoracion manual']
@@ -2014,6 +2030,7 @@ def valorar_calidad_global(val):
                                           'Precio': pre,
                                           'Valoracion datos obsoletos': vdo,
                                           'Tasa falsos positivos': tfp,
+                                          'Tasa duplicados otras fuentes': tdof,
                                           'Valoracion manual': v_m,
                                           'Calidad': cal,
                                           'Diversidad': div,
@@ -2856,6 +2873,8 @@ def crear_report_fuentes(path, tit, fue_dat, lista_cabecera, df_fuente_obs, df_r
             atributo = 'Obsolete data valuation'
         elif atributo == 'Tasa falsos positivos':
             atributo = 'False positive rate'
+        elif atributo == 'Tasa duplicados otras fuentes':
+            atributo = 'Duplication rate with other sources'
         elif atributo == 'Precio':
             atributo = 'Price'
         elif atributo == 'Valoracion manual':
@@ -3098,6 +3117,7 @@ def generar_informe_fuentes(val, val_fuentes):
                               'Tipologias',
                               'Valoracion datos obsoletos',
                               'Tasa falsos positivos',
+                              'Tasa duplicados otras fuentes',
                               'Precio',
                               'Valoracion manual'],
                              obs,
