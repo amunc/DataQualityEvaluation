@@ -5212,7 +5212,7 @@ def makedir(directory_path):
 
     try:
         os.mkdir(directory_path)
-    except WindowsError:
+    except FileExistsError:
         pass
 
 
